@@ -7,6 +7,9 @@ class ASCharacter: ACharacter
     USpringArmComponent CameraBoom;
     // Set default values for subobjects with `default` statements
     // No need and no function of CreatedefaultSubObject
+    default CameraBoom.bUsePawnControlRotation = true;
+    default bUseControllerRotationYaw = false;
+    default CharacterMovement.bOrientRotationToMovement = true;
     
     UPROPERTY(DefaultComponent, EditAnywhere, Category = "Camera", Attach = CameraBoom)
     UCameraComponent Camera;
@@ -28,19 +31,28 @@ class ASCharacter: ACharacter
         ScriptInputComponent.BindAxis(n"MoveRight", FInputAxisHandlerDynamicSignature(this, n"OnMoveRightAxisChanged"));
         ScriptInputComponent.BindAxis(n"TurnX", FInputAxisHandlerDynamicSignature(this, n"OnTurnXAxisChanged"));
         ScriptInputComponent.BindAxis(n"TurnY", FInputAxisHandlerDynamicSignature(this, n"OnTurnYAxisChanged"));
+        ScriptInputComponent.BindAction(n"Jump", EInputEvent::IE_Pressed, FInputActionHandlerDynamicSignature(this, n"OnJumpPressed"));
+        ScriptInputComponent.BindAction(n"Jump", EInputEvent::IE_Released, FInputActionHandlerDynamicSignature(this, n"OnJumpReleased"));
+
     }
 
     
     UFUNCTION()
     void OnMoveForwardAxisChanged(float32 AxisValue)
     {
-       AddMovementInput(GetActorForwardVector(),AxisValue,false);
+        FRotator ControlRot = GetControlRotation();
+        ControlRot.Pitch = 0.0f;
+        ControlRot.Roll = 0.0f;
+       AddMovementInput(ControlRot.Vector(),AxisValue,false);
     }
 
     UFUNCTION()
     void OnMoveRightAxisChanged(float32 AxisValue)
     {
-        AddMovementInput(GetActorRightVector(),AxisValue,false);
+        FRotator ControlRot = GetControlRotation();
+        ControlRot.Pitch = 0.0f;
+        ControlRot.Roll = 0.0f;
+        AddMovementInput(ControlRot.GetRightVector(),AxisValue,false);
 
     }
 
@@ -54,6 +66,22 @@ class ASCharacter: ACharacter
     void OnTurnYAxisChanged(float32 AxisValue)
     {
         AddControllerPitchInput(AxisValue);
+    }
+
+    UFUNCTION()
+    void OnJumpPressed(FKey Key)
+    {
+        Print("Jump was pressed!", Duration=5.0);
+
+        Jump();
+    }
+
+    UFUNCTION()
+    void OnJumpReleased(FKey Key)
+    {
+        Print("Jump was released!", Duration=5.0);
+
+        StopJumping();
     }
 
 
