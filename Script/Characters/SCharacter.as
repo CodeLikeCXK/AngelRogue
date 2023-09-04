@@ -14,6 +14,12 @@ class ASCharacter: ACharacter
     UPROPERTY(DefaultComponent, EditAnywhere, Category = "Camera", Attach = CameraBoom)
     UCameraComponent Camera;
 
+    UPROPERTY(EditAnywhere, Category = "Attack")
+    TSubclassOf<AActor> ProjectileClass;
+
+    UPROPERTY(DefaultComponent, EditAnywhere, Category = "Magic", DisplayName = "Magic Location", Attach = CharacterMesh0, AttachSocket = "Muzzle_01")
+    USceneComponent MagicSourceComponent;
+
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
@@ -33,6 +39,9 @@ class ASCharacter: ACharacter
         ScriptInputComponent.BindAxis(n"TurnY", FInputAxisHandlerDynamicSignature(this, n"OnTurnYAxisChanged"));
         ScriptInputComponent.BindAction(n"Jump", EInputEvent::IE_Pressed, FInputActionHandlerDynamicSignature(this, n"OnJumpPressed"));
         ScriptInputComponent.BindAction(n"Jump", EInputEvent::IE_Released, FInputActionHandlerDynamicSignature(this, n"OnJumpReleased"));
+
+        ScriptInputComponent.BindAction(n"PrimaryAttack", EInputEvent::IE_Pressed, FInputActionHandlerDynamicSignature(this, n"PrimaryAttack"));
+
 
     }
 
@@ -83,6 +92,15 @@ class ASCharacter: ACharacter
 
         StopJumping();
     }
+
+    UFUNCTION()
+    void PrimaryAttack(FKey Key)
+    {  
+        FVector HandLocation = MagicSourceComponent.GetWorldLocation();
+        AActor ProjectileActor;
+        ProjectileActor = SpawnActor(ProjectileClass,HandLocation,(GetControlRotation()),NAME_None,false,GetLevel());
+    }
+
 
 
 
