@@ -11,6 +11,15 @@ class ASMagicProjectile : AActor
 
     default SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+    ASMagicProjectile()
+    {
+        //set collision object type
+        SphereComponent.SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+        SphereComponent.SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+        SphereComponent.SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn,ECollisionResponse::ECR_Overlap);
+    }
+
+
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {        
